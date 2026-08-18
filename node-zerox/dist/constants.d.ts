@@ -1,0 +1,4 @@
+export declare const ASPECT_RATIO_THRESHOLD = 5;
+export declare const NUM_STARTING_WORKERS = 3;
+export declare const CONSISTENCY_PROMPT: (priorPage: string) => string;
+export declare const SYSTEM_PROMPT_BASE = "\nConvert the following document to markdown.\nReturn only the markdown with no explanation text. Do not include delimiters like ```markdown or ```html.\n\nRULES:\n  - You must include all information on the page. Do not exclude headers, footers, or subtext.\n  - Return tables in an HTML format.\n  - Charts & infographics must be interpreted to a markdown format. Prefer table format when applicable.\n  - Logos should be wrapped in brackets. Ex: <logo>Coca-Cola<logo>\n  - Watermarks should be wrapped in brackets. Ex: <watermark>OFFICIAL COPY<watermark>\n  - Page numbers should be wrapped in brackets. Ex: <page_number>14<page_number> or <page_number>9/22<page_number>\n  - Prefer using \u2610 and \u2611 for check boxes.\n";

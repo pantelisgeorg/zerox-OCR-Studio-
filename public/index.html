@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>zerox OCR Studio</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">zerox <span>OCR Studio</span></div>
+    <div class="env-note" id="env-note"></div>
+  </header>
+
+  <main>
+    <aside class="sidebar">
+      <section class="panel">
+        <h2>1. Input file</h2>
+        <div class="row">
+          <select id="file-select"></select>
+          <button id="refresh-files" class="icon-btn" title="Refresh file list">&#x21bb;</button>
+        </div>
+        <div class="row">
+          <input type="file" id="upload-input" hidden />
+          <button id="upload-btn" class="secondary">Upload file</button>
+          <span id="upload-status" class="muted"></span>
+        </div>
+        <div id="file-preview" class="file-preview hidden">
+          <img id="preview-img" alt="preview" />
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>2. Settings</h2>
+        <label class="field">
+          <span>Model</span>
+          <select id="model-select">
+            <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+            <option value="gpt-4.1">gpt-4.1</option>
+            <option value="gpt-4o">gpt-4o</option>
+            <option value="gpt-4o-mini">gpt-4o-mini</option>
+          </select>
+        </label>
+        <div class="row two-col">
+          <label class="field">
+            <span>Concurrency</span>
+            <input type="number" id="concurrency" min="1" max="20" value="5" />
+          </label>
+          <label class="field">
+            <span>Image density</span>
+            <input type="number" id="image-density" min="72" max="600" value="300" />
+          </label>
+        </div>
+        <details class="prompts">
+          <summary>Prompts (advanced)</summary>
+          <label class="field">
+            <span>System prompt</span>
+            <textarea id="system-prompt" rows="8" spellcheck="false"></textarea>
+          </label>
+          <label class="field">
+            <span>User prompt</span>
+            <textarea id="user-prompt" rows="5" spellcheck="false"></textarea>
+          </label>
+          <div class="row">
+            <button id="reset-prompts" class="link-btn">Reset to defaults</button>
+          </div>
+        </details>
+      </section>
+
+      <section class="panel">
+        <button id="run-btn" class="run-btn">Run OCR</button>
+        <div id="run-status" class="run-status muted">Idle</div>
+        <div class="progress"><div id="progress-bar"></div></div>
+      </section>
+
+      <section class="panel">
+        <h2>Runs</h2>
+        <div id="jobs-list" class="jobs-list"></div>
+      </section>
+    </aside>
+
+    <section class="viewer">
+      <div class="viewer-toolbar" id="viewer-toolbar">
+        <div class="tabs" id="tabs">
+          <button data-tab="markdown" class="tab active">Markdown</button>
+          <button data-tab="raw" class="tab">Raw md</button>
+          <button data-tab="json" class="tab">JSON</button>
+          <button data-tab="warnings" class="tab">Warnings <span id="warn-badge" class="badge hidden">0</span></button>
+        </div>
+        <div class="toolbar-right">
+          <div id="page-nav" class="page-nav hidden">
+            <button id="prev-page">&#8249;</button>
+            <span id="page-indicator"></span>
+            <button id="next-page">&#8250;</button>
+          </div>
+          <a id="dl-md" class="dl hidden" download>Download .md</a>
+          <a id="dl-json" class="dl hidden" download>Download .json</a>
+        </div>
+      </div>
+      <div id="viewer-content" class="viewer-content">
+        <div class="placeholder">
+          <p>Select a file on the left and press <strong>Run OCR</strong>,<br/>
+          or click a previous run below to view its results.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

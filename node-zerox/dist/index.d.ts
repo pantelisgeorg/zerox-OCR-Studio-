@@ -1,0 +1,3 @@
+import "./handleWarnings";
+import { ZeroxArgs, ZeroxOutput } from "./types";
+export declare const zerox: ({ cleanup, concurrency, correctOrientation, credentials, customModelFunction, directImageExtraction, enableHybridExtraction, errorMode, extractionCredentials, extractionLlmParams, extractionModel, extractionModelProvider, extractionPrompt, extractOnly, extractPerPage, filePath, imageDensity, imageFormat, imageHeight, llmParams, maintainFormat, maxImageSize, maxRetries, maxTesseractWorkers, model, modelProvider, openaiAPIKey, outputDir, pagesToConvertAsImages, prompt, schema, tempDir, trimEdges, }: ZeroxArgs) => Promise<ZeroxOutput>;
