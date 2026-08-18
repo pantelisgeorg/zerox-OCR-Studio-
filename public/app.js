@@ -8,6 +8,7 @@ const state = {
   currentJson: null,
   currentPage: 0,
   activeTab: 'markdown',
+  markdownScroll: 0,
   pollTimer: null,
   startTime: null,
   tickTimer: null,
@@ -174,14 +175,23 @@ async function selectJob(id) {
   state.currentJobId = id;
   state.currentJson = null;
   state.currentPage = 0;
+  state.markdownScroll = 0;
+  setActiveTab('markdown');
+  $('#page-nav').classList.add('hidden');
   clearPolling();
   renderJobs();
   await refreshJob(id);
 }
 
+function setActiveTab(tab) {
+  state.activeTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+}
+
 async function refreshJob(id) {
   try {
     const meta = await api(`/api/jobs/${id}`);
+    if (state.currentJobId !== id) return; // user switched jobs meanwhile
     state.currentMeta = meta;
 
     if (meta.status === 'running' || meta.status === 'queued') {
@@ -196,9 +206,10 @@ async function refreshJob(id) {
       $('#run-btn').disabled = false;
       $('#run-status').textContent = 'Idle';
       const json = await api(`/api/jobs/${id}/result.json`).catch(() => null);
+      if (state.currentJobId !== id) return; // user switched jobs meanwhile
       if (json) {
         state.currentJson = json;
-        renderResult(json, meta);
+        renderTab(state.activeTab);
       } else {
         renderError('Result files not found for this job.');
       }
@@ -211,6 +222,7 @@ async function refreshJob(id) {
 }
 
 function startPolling(id) {
+  if (state.pollTimer) return; // already polling, avoid timer accumulation
   state.startTime = Date.now();
   state.tickTimer = setInterval(updateElapsed, 1000);
   state.pollTimer = setInterval(async () => {
@@ -325,12 +337,14 @@ function renderResult(json, meta) {
   }
 
   $('#viewer-content').innerHTML = html;
-  $('#viewer-content').scrollTop = 0;
 }
 
 function renderTab(tab) {
-  state.activeTab = tab;
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  const viewer = $('#viewer-content');
+  if (tab !== 'markdown' && state.activeTab === 'markdown') {
+    state.markdownScroll = viewer.scrollTop;
+  }
+  setActiveTab(tab);
   $('#page-nav').classList.add('hidden');
 
   if (!state.currentJson) return;
@@ -339,6 +353,7 @@ function renderTab(tab) {
 
   if (tab === 'markdown') {
     renderResult(state.currentJson, meta);
+    viewer.scrollTop = state.markdownScroll || 0;
     return;
   } else if (tab === 'raw') {
     const md = state.currentJson.pages.map(p => p.markdown || '').join('\n\n---\n\n');
@@ -354,7 +369,8 @@ function renderTab(tab) {
         `<li><span class="muted">page ${w.page}</span> ${esc(w.message)}</li>`).join('')}</ul>`;
     }
   }
-  $('#viewer-content').innerHTML = content;
+  viewer.innerHTML = content;
+  viewer.scrollTop = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -498,11 +514,12 @@ $('#reset-prompts').onclick = () => {
   $('#system-prompt').value = defaults.systemPrompt;
   $('#user-prompt').value = defaults.userPrompt;
 };
-$('#prev-page').onclick = () => { if (state.currentPage > 0) { state.currentPage--; renderResult(state.currentJson, state.currentMeta); } };
+$('#prev-page').onclick = () => { if (state.currentPage > 0) { state.currentPage--; renderResult(state.currentJson, state.currentMeta); $('#viewer-content').scrollTop = 0; } };
 $('#next-page').onclick = () => {
   if (state.currentJson && state.currentPage < state.currentJson.pages.length - 1) {
     state.currentPage++;
     renderResult(state.currentJson, state.currentMeta);
+    $('#viewer-content').scrollTop = 0;
   }
 };
 document.querySelectorAll('.tab').forEach(t => { t.onclick = () => renderTab(t.dataset.tab); });
